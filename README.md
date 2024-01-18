@@ -26,7 +26,7 @@ You will retrieve a global variable in your script called '$azureGraphAuthentica
 ## Retrieve Endpoint Manager Objects
 These functions are based on that the Connect-GraphAPI has been run and is authenticated, otherwise you will receive an error than you need to connect.
 ```
-# This creates a Powershell HashTable Object
+# This creates a Powershell HashTable Object with the serialNumber as Key, for example $EndpointDevice['COMPUTER-XXXXXX']
 Get-EndpointManagerDevices -AsHashTable -LogToFile "<True/False>"
 
 # This gives you a normal Powershell Object
