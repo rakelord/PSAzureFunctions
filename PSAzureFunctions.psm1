@@ -82,13 +82,13 @@ Function Get-EndpointManagerDevices {
         
         # Faster filtering if HashTable is used, if you can reference the serialnumber when looking for device in Object list.
         $HashTable = @{}
-        foreach ($Device in $uniqueDevices){
+        foreach ($Device in $EndpointDevices){
             $HashTable[$Device.serialNumber] = $Device
         }
         if ($AsHashTable) { return $HashTable }
 
         $deviceList = @()
-        foreach ($Device in $uniqueDevices.Keys) {
+        foreach ($Device in $HashTable.Keys) {
             $deviceList += $HashTable[$Device]
         }
         return $deviceList
