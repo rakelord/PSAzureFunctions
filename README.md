@@ -18,14 +18,15 @@ Windows default - "C:\Program Files\WindowsPowerShell\Modules"
 First you are going to have to create an Azure Application with an API Secret which is explained in Microsofts official RestAPI documentation.
 <br><br>
 - LogToFile parameter is connected to the PSLoggingFunctions module and is used for easy logging.
-```
+
+```powershell
  Connect-GraphAPI -AzureTenantID "<TENANTID>" -ApplicationID "<APPLICATIONID>" -APISecret "<APISECRET>" -LogToFile "<True/False>"
 ```
 You will retrieve a global variable in your script called '$azureGraphAuthenticationHeader' the variable can be used with your own Invoke-RestMethod commands if needed, otherwise you can use the module functions which have this variable implemented already.
 
 ## Retrieve Endpoint Manager Objects
 These functions are based on that the Connect-GraphAPI has been run and is authenticated, otherwise you will receive an error than you need to connect.
-```
+```powershell
 # This creates a Powershell HashTable Object with the serialNumber as Key.
 # Example $EndpointDevice['COMPUTER-XXXXXX']
 Get-EndpointManagerDevices -AsHashTable -LogToFile "<True/False>"
