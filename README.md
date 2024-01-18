@@ -15,7 +15,7 @@ Windows default - "C:\Program Files\WindowsPowerShell\Modules"
 
 # Functions examples
 ## Connect to the API
-First you are going to have to create a API Token which is explained in Microsofts official RestAPI documentation.
+First you are going to have to create an Azure Application with an API Secret which is explained in Microsofts official RestAPI documentation.
 <br><br>
 - LogToFile parameter is connected to the PSLoggingFunctions module and is used for easy logging.
 ```
