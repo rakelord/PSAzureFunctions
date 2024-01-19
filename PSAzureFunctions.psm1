@@ -5,7 +5,7 @@ Function Connect-GraphAPI {
         [parameter(mandatory)]
         $ApplicationID,
         $APISecret,
-        [System.Security.Cryptography.X509Certificates.X509Certificate2]$Cert,
+        $CertThumbprint,
         [parameter(mandatory)]
         [ValidateSet("True","False")]
         $LogToFile
@@ -18,6 +18,8 @@ Function Connect-GraphAPI {
     }
 
     $OAUTH2Url = "https://login.microsoftonline.com/$AzureTenantID/oauth2/v2.0/token"
+
+    $Cert = Get-Certificate -thumbPrint $CertThumbprint -storeName "My"
 
     Write-Log -Message "Connecting to Azure Graph API" -Active $LogToFile
     
@@ -151,6 +153,20 @@ Function Get-EndpointManagerDevices {
     }
 }
 
+function Get-Certificate {
+    Param(
+        [parameter(mandatory)]
+        $thumbPrint,
+        [parameter(mandatory)]
+        $storeName
+    )
+    $store = New-Object System.Security.Cryptography.X509Certificates.X509Store($storeName, "LocalMachine")
+    $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadOnly)
+    $certificates = $store.Certificates.Find([System.Security.Cryptography.X509Certificates.X509FindType]::FindByThumbprint, $thumbPrint, $false)
+    $store.Close()
+
+    return $certificates[0]
+}
 function ConvertTo-Base64UrlString {
     <#
     .SYNOPSIS
