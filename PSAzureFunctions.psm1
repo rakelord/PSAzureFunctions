@@ -1,4 +1,36 @@
 Function Connect-GraphAPI {
+    <#
+    .SYNOPSIS
+    Connect to Azure Graph API
+    
+    .DESCRIPTION
+    Connect to Azure Graph API with either a Secret value from your Azure Application
+    OR
+    Connect with a uploaded certificate, you need to install the certificate in your LocalMachine\My store for this to work.
+    When connected you recieve a header variable $azureGraphAuthenticationHeader that you can use with your own Invoke-RestMethod commands if needed.
+    All the Modules within this Module already uses this value so you never need to add it anywhere if you are not doing your own things.
+    
+    .PARAMETER AzureTenantID
+    Your Azure Tenant ID
+    
+    .PARAMETER ApplicationID
+    The Azure Application ID for your Application.
+    
+    .PARAMETER APISecret
+    If CertThumbprint is not used then this should be supplied - the Secret value created from your Azure Application
+    
+    .PARAMETER CertThumbprint
+    Your Certificate Thumbprint that is installed in your 'LocalMachine\My' store and Uploaded to the Azure Application
+    
+    .PARAMETER LogToFile
+    This parameter is connected to the Module PSLoggingFunctions mot information can be found on the GitHub.
+    https://github.com/rakelord/PSLoggingFunctions
+    
+    .EXAMPLE
+    Connect-GraphAPI -AzureTenantID "1533bb8f-4d6a-54b3-a5d3-48463a22ca25" -ApplicationID "2cf231fa-236d-4ew1-ja72-a14a45web451" -APISecret "ZTasdergearbgaerbnreanrae=" -LogToFile $True
+    Connect-GraphAPI -AzureTenantID "1533bb8f-4d6a-54b3-a5d3-48463a22ca25" -ApplicationID "2cf231fa-236d-4ew1-ja72-a14a45web451" -CertThumbprint "40F51F9DCA3245FSDG7654GTSDSGDF1D78031C9" -LogToFile $False
+    
+    #>
     param(
         [parameter(mandatory)]
         $AzureTenantID,
