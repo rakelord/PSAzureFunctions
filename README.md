@@ -10,7 +10,7 @@ If you are looking a function that is missing please send me a message/comment a
 * PSLoggingFunctions (https://github.com/rakelord/PSLoggingFunctions)
 
 # Getting started
-## Download this module folder and all Required Powershell Modules and place them in your PSModulePath folder<br>
+## Download this PowerShell Module and all Required PowerShell Modules and place them in your PSModulePath folder<br>
 You can use this command to show your available locations
 ```powershell 
 $env:PSModulePath -split ";"
