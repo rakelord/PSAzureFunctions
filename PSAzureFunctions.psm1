@@ -299,49 +299,18 @@ function New-Jwt {
 
     $toSign = [System.Text.Encoding]::UTF8.GetBytes($jwt)
 
-    switch($Alg) {
-    
-        "RS256" {
-            if (-not $PSBoundParameters.ContainsKey("Cert")) {
-                throw "RS256 requires -Cert parameter of type System.Security.Cryptography.X509Certificates.X509Certificate2"
-            }
-            Write-Verbose "Signing certificate: $($Cert.Subject)"
-            $rsa = $Cert.PrivateKey
-            if ($null -eq $rsa) { # Requiring the private key to be present; else cannot sign!
-                throw "There's no private key in the supplied certificate - cannot sign" 
-            }
-            else {
-                # Overloads tested with RSACryptoServiceProvider, RSACng, RSAOpenSsl
-                try { $sig = ConvertTo-Base64UrlString $rsa.SignData($toSign,[Security.Cryptography.HashAlgorithmName]::SHA256,[Security.Cryptography.RSASignaturePadding]::Pkcs1) }
-                catch { throw New-Object System.Exception -ArgumentList ("Signing with SHA256 and Pkcs1 padding failed using private key $($rsa): $_", $_.Exception) }
-            }
-        }
-        "HS256" {
-            if (-not ($PSBoundParameters.ContainsKey("Secret"))) {
-                throw "HS256 requires -Secret parameter"
-            }
-            try { 
-                $hmacsha256 = New-Object System.Security.Cryptography.HMACSHA256
-                if ($Secret -is [byte[]]) {
-                    $hmacsha256.Key = $Secret
-                }
-                elseif ($Secret -is [string]) {
-                    $hmacsha256.Key = [System.Text.Encoding]::UTF8.GetBytes($Secret)
-                }
-                else {
-                    throw "Expected Secret parameter as byte array or string, instead got $($Secret.gettype())"
-                }                
-                $sig = ConvertTo-Base64UrlString $hmacsha256.ComputeHash($toSign)
-            }
-            catch { throw New-Object System.Exception -ArgumentList ("Signing with HMACSHA256 failed: $_", $_.Exception) }
-        }
-        "none" {
-            $sig = $null
-        }
-        default {
-            throw 'The algorithm is not one of the supported: "RS256", "HS256", "none"'
-        }
-
+    if (-not $PSBoundParameters.ContainsKey("Cert")) {
+        throw "RS256 requires -Cert parameter of type System.Security.Cryptography.X509Certificates.X509Certificate2"
+    }
+    Write-Verbose "Signing certificate: $($Cert.Subject)"
+    $rsa = $Cert.PrivateKey
+    if ($null -eq $rsa) { # Requiring the private key to be present; else cannot sign!
+        throw "There's no private key in the supplied certificate - cannot sign" 
+    }
+    else {
+        # Overloads tested with RSACryptoServiceProvider, RSACng, RSAOpenSsl
+        try { $sig = ConvertTo-Base64UrlString $rsa.SignData($toSign,[Security.Cryptography.HashAlgorithmName]::SHA256,[Security.Cryptography.RSASignaturePadding]::Pkcs1) }
+        catch { throw New-Object System.Exception -ArgumentList ("Signing with SHA256 and Pkcs1 padding failed using private key $($rsa): $_", $_.Exception) }
     }
     
     $jwt = $jwt + '.' + $sig
