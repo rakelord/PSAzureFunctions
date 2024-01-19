@@ -18,12 +18,16 @@ $env:PSModulePath -split ";"
 
 # Functions examples
 ## Connect to the API
-First you are going to have to create an Azure Application with an API Secret which is explained in Microsofts official RestAPI documentation.
+First you are going to have to create an Azure Application with an API Secret or a Certificate which is explained in Microsofts official RestAPI documentation.
 <br><br>
 - LogToFile parameter is connected to the PSLoggingFunctions module and is used for easy logging.
 
 ```powershell
  Connect-GraphAPI -AzureTenantID "<TENANTID>" -ApplicationID "<APPLICATIONID>" -APISecret "<APISECRET>" -LogToFile "<True/False>"
+```
+OR
+```powershell
+ Connect-GraphAPI -AzureTenantID "<TENANTID>" -ApplicationID "<APPLICATIONID>" -Cert "<CERT VARIABLE X509>" -LogToFile "<True/False>"
 ```
 You will retrieve a global variable in your script called '$azureGraphAuthenticationHeader' the variable can be used with your own Invoke-RestMethod commands if needed, otherwise you can use the module functions which have this variable implemented already.
 
