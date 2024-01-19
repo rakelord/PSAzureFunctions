@@ -16,6 +16,8 @@ You can use this command to show your available locations
 $env:PSModulePath -split ";"
 ``` 
 
+## All functions are based on that the Connect-GraphAPI has been run and is authenticated, otherwise you will receive an error than you need to connect.
+
 # Functions examples
 ## Connect to the API
 First you are going to have to create an Azure Application with an API Secret or a Certificate which is explained in Microsofts official RestAPI documentation.
@@ -32,7 +34,6 @@ OR
 You will retrieve a global variable in your script called '$azureGraphAuthenticationHeader' the variable can be used with your own Invoke-RestMethod commands if needed, otherwise you can use the module functions which have this variable implemented already.
 
 ## Retrieve Endpoint Manager Objects
-These functions are based on that the Connect-GraphAPI has been run and is authenticated, otherwise you will receive an error than you need to connect.
 ```powershell
 # This creates a Powershell HashTable Object with the serialNumber as Key.
 # Example $EndpointDevice['COMPUTER-XXXXXX']
@@ -40,4 +41,16 @@ Get-EndpointManagerDevices -AsHashTable -LogToFile "<True/False>"
 
 # This gives you a normal Powershell Object
 Get-EndpointManagerDevices -LogToFile "<True/False>"
+```
+
+## Retrieve Entra User Objects
+```powershell
+# This creates a Powershell HashTable Object with the ID as Key.
+# Example $EntraObject['XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX']
+Get-EntraUsers -AsHashTable -HashTableKey id -LogToFile $True
+# Or if you want userprincipalName as Key
+Get-EntraUsers -AsHashTable -HashTableKey userprincipalName -LogToFile $True
+
+# This gives you a normal Powershell Object
+Get-EntraUsers -LogToFile $True
 ```
