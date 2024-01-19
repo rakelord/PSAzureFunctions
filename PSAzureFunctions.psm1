@@ -73,7 +73,8 @@ Function Connect-GraphAPI {
     if ($GraphAPIToken.access_token){
         $global:AzureGraphAPIAuthenticated = $true
         Write-Log -Message "Azure Graph API Authenticated: $AzureGraphAPIAuthenticated" -Active $LogToFile
-        Write-Host "Azure Graph API Authenticated: $AzureGraphAPIAuthenticated`nUse Header Connection Variable = "+'$azureGraphAuthenticationHeader'
+        Write-Host "Azure Graph API Authenticated: $AzureGraphAPIAuthenticated"
+        Write-Host "Use Header Connection Variable ="'$azureGraphAuthenticationHeader'
         $global:azureGraphAuthenticationHeader = $azureGraphAuthenticationHeader
         return ""
     }
