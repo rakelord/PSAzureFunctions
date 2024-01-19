@@ -105,6 +105,26 @@ function Convert-HexStringToByteArray {
 }
 
 Function Get-EndpointManagerDevices {
+    <#
+    .SYNOPSIS
+    Retrieve all Endpoint Manager Devices from Azure
+    
+    .DESCRIPTION
+    Retrieve all Endpoint Manager Devices from Azure and the ability to get the data as a HashTable or a normal Powershell object.
+    Also gives all objects a separation if they are mobile phones or computers.
+    
+    .PARAMETER LogToFile
+    This parameter is connected to the Module PSLoggingFunctions mot information can be found on the GitHub.
+    https://github.com/rakelord/PSLoggingFunctions
+
+    .PARAMETER AsHashTable
+    Great a HashTable with the serialNumber property as the Key value $Object[$serialNumber]
+    
+    .EXAMPLE
+    Get-EndpointManagerDevices -AsHashTable -LogToFile $True
+    Get-EndpointManagerDevices -LogToFile $False
+
+    #>
     param(
         [parameter(mandatory)]
         [ValidateSet("True","False")]
@@ -315,6 +335,68 @@ function New-Jwt {
     
     $jwt = $jwt + '.' + $sig
     return $jwt
+}
+
+function Get-EntraUsers {
+    <#
+    .SYNOPSIS
+    Retrieve all users from Azure Entra
+    
+    .DESCRIPTION
+    Retrieve all users from Azure Entra and let the user choose if they want a HashTable object or just normal Powershell Object
+    Also the ability to set which property to be the key in the hashtable.
+    
+    .PARAMETER HashTableKey
+    The $variable[keyvalue] - The key value that will be the filter
+    
+    .PARAMETER AsHashTable
+    If the function should return a HashTable otherwise it will be normal powershell object.
+    
+    .PARAMETER LogToFile
+    This parameter is connected to the Module PSLoggingFunctions mot information can be found on the GitHub.
+    https://github.com/rakelord/PSLoggingFunctions
+    
+    .EXAMPLE
+    Return a HashTable with the userprincipalName as Hash Key and create a log
+    Get-EntraUsers -AsHashTable -HashTableKey "userprincipalName" -LogToFile $True
+    
+    Return a Normal Powershell object and do not Log 
+    Get-EntraUsers -LogToFile $False
+    
+    #>
+    Param(
+        [switch]
+        $AsHashTable,
+        $HashTableKey,
+        [parameter(mandatory)]
+        $LogToFile
+    )
+    if (Find-AzureGraphAPIConnection){
+        $Uri = "https://graph.microsoft.com/beta/users?" + '$top=999'
+        $UserObjects = @()
+        do {
+            $Results = Invoke-TryCatchLog -InfoLog "Retrieving 1000 Entra User objects" -LogToFile $LogToFile -ScriptBlock {
+                Invoke-RestMethod -Headers $azureGraphAuthenticationHeader -Uri $Uri -UseBasicParsing -Method "GET" -ContentType "application/json"
+            }
+            if ($Results.value) {
+                $UserObjects += $Results.value
+            }
+            else {
+                $UserObjects += $Results
+            }
+            $uri = $Results.'@odata.nextlink'
+        } until (!($uri))
+
+        if ($AsHashTable){
+            $HashTable = @{}
+            foreach ($user in $UserObjects) {
+                $HashTable[$user."$HashTableKey"] = $user
+            }
+            return $HashTable
+        }
+
+        return $UserObjects
+    }
 }
 
 Export-ModuleMember -Function * -Alias *
