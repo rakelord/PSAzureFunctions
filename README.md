@@ -27,7 +27,7 @@ First you are going to have to create an Azure Application with an API Secret or
 ```
 OR
 ```powershell
- Connect-GraphAPI -AzureTenantID "<TENANTID>" -ApplicationID "<APPLICATIONID>" -Cert "<CERT VARIABLE X509>" -LogToFile "<True/False>"
+ Connect-GraphAPI -AzureTenantID "<TENANTID>" -ApplicationID "<APPLICATIONID>" -Cert "<CERT X509 OBJECT>" -LogToFile "<True/False>"
 ```
 You will retrieve a global variable in your script called '$azureGraphAuthenticationHeader' the variable can be used with your own Invoke-RestMethod commands if needed, otherwise you can use the module functions which have this variable implemented already.
 
