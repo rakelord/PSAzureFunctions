@@ -51,4 +51,7 @@ Get-EntraIDUsers -AsHashTable -HashTableKey userprincipalName -LogToFile $True
 
 # This gives you a normal Powershell Object
 Get-EntraIDUsers -LogToFile $True
+
+# Use a filter to only retrieve a small amount of data
+Get-EntraIDUsers -Filter "startswith(displayName,'Mag')" -LogToFile $False
 ```
