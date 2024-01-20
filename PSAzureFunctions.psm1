@@ -51,7 +51,7 @@ Function Connect-GraphAPI {
 
     $OAUTH2Url = "https://login.microsoftonline.com/$AzureTenantID/oauth2/v2.0/token"
 
-    $Cert = Get-Certificate -thumbPrint $CertThumbprint -storeName "My"
+    $Cert = Get-X509Certificate -thumbPrint $CertThumbprint -storeName "My"
 
     Write-Log -Message "Connecting to Azure Graph API" -Active $LogToFile
     
@@ -156,6 +156,10 @@ Function Get-EndpointManagerDevices {
     Get-EndpointManagerDevices -AsHashTable -LogToFile $True
     Get-EndpointManagerDevices -LogToFile $False
 
+    .NOTES
+    You need these Azure Application permissions for this to work.
+    Application - DeviceManagementManagedDevices.Read.All
+
     #>
     param(
         [parameter(mandatory)]
@@ -206,7 +210,7 @@ Function Get-EndpointManagerDevices {
     }
 }
 
-function Get-Certificate {
+function Get-X509Certificate {
     Param(
         [parameter(mandatory)]
         $thumbPrint,
@@ -395,12 +399,17 @@ function Get-EntraIDUsers {
     Return a Normal Powershell object and do not Log 
     Get-EntraUsers -LogToFile $False
     
+    .NOTES
+    You need these Azure Application permissions for this to work.
+    Application - User.Read.All
+
     #>
     Param(
         [switch]
         $AsHashTable,
         $HashTableKey,
         [parameter(mandatory)]
+        [ValidateSet("True","False")]
         $LogToFile
     )
     if (Find-AzureGraphAPIConnection){
@@ -428,6 +437,48 @@ function Get-EntraIDUsers {
         }
 
         return $UserObjects
+    }
+}
+
+Function Get-AzureTenantSecurityScore {
+    <#
+    .SYNOPSIS
+    Retrieve the Azure Tenants Security Score
+    
+    .DESCRIPTION
+    Retrieve the Azure Tenants Security Score, only get the latest score instead of a long list.
+    And only retrieve the Secore + Comparable Tenants Score
+    
+    .PARAMETER LogToFile
+    This parameter is for logging, check GitHub for PSLoggingFunctions if you want to learn more, just set $True if you want logging or $False if you don't want any logging.
+    
+    .EXAMPLE
+    Get-AzureTenantSecurityScore -LogToFile $False
+    
+    *OUTPUT*
+    ComparableTenantsSecurityScore TenantSecurityScore
+    ------------------------------ -------------------
+                             40,43               60,64
+
+    .NOTES
+    You need these Azure Application permissions for this to work.
+    Application - SecurityEvents.Read.All
+
+    #>
+    Param(
+        [parameter(mandatory)]
+        [ValidateSet("True","False")]
+        $LogToFile
+    )
+
+    if (Find-AzureGraphAPIConnection){
+        $securityScore = Invoke-TryCatchLog -InfoLog "Retrieving Security Score for Tenant" -LogToFile $LogToFile -ScriptBlock {
+            Invoke-RestMethod -Method GET -Uri 'https://graph.microsoft.com/beta/security/secureScores?$top=1' -Headers $azureGraphAuthenticationHeader
+        }
+        return @{
+            TenantSecurityScore = [math]::Round(($securityScore.value.currentScore / $securityScore.value.maxScore) * 100,2)
+            ComparableTenantsSecurityScore = ($securityScore.value.averageComparativeScores | Where-Object {$_.basis -eq 'TotalSeats'}).averageScore
+        }
     }
 }
 
