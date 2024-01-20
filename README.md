@@ -9,8 +9,7 @@ If you are looking a function that is missing please send me a message/comment a
 # Required modules
 * PSLoggingFunctions (https://github.com/rakelord/PSLoggingFunctions)
 
-# Getting started
-## Download Required PowerShell Modules and place them in your PSModulePath folder<br>
+# Installation
 ```powershell 
 Install-Module -Name PSAzureFunctions
 ``` 
