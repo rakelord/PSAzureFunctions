@@ -13,6 +13,9 @@ If you are looking a function that is missing please send me a message/comment a
 ```powershell 
 Install-Module -Name PSAzureFunctions
 ``` 
+# Offline Installation
+Just run the OfflineInstallation.ps1 as Administrator
+PS: You need to download all the files into the same directory and then run the script, they will then be copied to the Users PSModuleDirectory.
 
 ## All functions are based on that the Connect-GraphAPI has been run and is authenticated, otherwise you will receive an error than you need to connect.
 
