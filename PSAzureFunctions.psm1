@@ -369,7 +369,7 @@ function New-Jwt {
     return $jwt
 }
 
-function Get-EntraUsers {
+function Get-EntraIDUsers {
     <#
     .SYNOPSIS
     Retrieve all users from Azure Entra

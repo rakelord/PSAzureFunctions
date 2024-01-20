@@ -46,10 +46,10 @@ Get-EndpointManagerDevices -LogToFile "<True/False>"
 ```powershell
 # This creates a Powershell HashTable Object with the ID as Key.
 # Example $EntraObject['XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX']
-Get-EntraUsers -AsHashTable -HashTableKey id -LogToFile $True
+Get-EntraIDUsers -AsHashTable -HashTableKey id -LogToFile $True
 # Or if you want userprincipalName as Key
-Get-EntraUsers -AsHashTable -HashTableKey userprincipalName -LogToFile $True
+Get-EntraIDUsers -AsHashTable -HashTableKey userprincipalName -LogToFile $True
 
 # This gives you a normal Powershell Object
-Get-EntraUsers -LogToFile $True
+Get-EntraIDUsers -LogToFile $True
 ```
