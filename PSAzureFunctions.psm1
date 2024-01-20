@@ -408,12 +408,18 @@ function Get-EntraIDUsers {
         [switch]
         $AsHashTable,
         $HashTableKey,
+        $Filter,
         [parameter(mandatory)]
         [ValidateSet("True","False")]
         $LogToFile
     )
     if (Find-AzureGraphAPIConnection){
+
         $Uri = "https://graph.microsoft.com/beta/users?" + '$top=999'
+        if ($Filter){
+            $Uri = $Uri + '&$filter=' + $Filter
+        }
+
         $UserObjects = @()
         do {
             $Results = Invoke-TryCatchLog -InfoLog "Retrieving 1000 Entra User objects" -LogToFile $LogToFile -ScriptBlock {
@@ -426,6 +432,10 @@ function Get-EntraIDUsers {
                 $UserObjects += $Results
             }
             $uri = $Results.'@odata.nextlink'
+            if ($Filter -AND $uri){
+                $uri = $uri + '&$filter=' + $Filter
+            }
+
         } until (!($uri))
 
         if ($AsHashTable){
