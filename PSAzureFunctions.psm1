@@ -51,11 +51,14 @@ Function Connect-GraphAPI {
 
     $OAUTH2Url = "https://login.microsoftonline.com/$AzureTenantID/oauth2/v2.0/token"
 
-    $Cert = Get-X509Certificate -thumbPrint $CertThumbprint -storeName "My"
-
     Write-Log -Message "Connecting to Azure Graph API" -Active $LogToFile
     
-    if ($Cert){ # Certificate
+    if ($CertThumbprint){ # Certificate
+
+        $Cert = Invoke-TryCatchLog -InfoLog "Searching for the Certificate: $CertThumbprint" -LogToFile $LogToFile -ScriptBlock {
+            Get-X509Certificate -thumbPrint $CertThumbprint -storeName "My"
+        }
+
         $binaryCertificateFingerprint = Convert-HexStringToByteArray($Cert.Thumbprint)
         $base64EncodedFingerprint = [System.Convert]::ToBase64String($binaryCertificateFingerprint)
 
@@ -78,7 +81,9 @@ Function Connect-GraphAPI {
             jti = (New-Guid).Guid
         } | ConvertTo-Json
 
-        $JWT_Token = New-Jwt -Cert $Cert -PayloadJson $JWT_Payload -Header $JWT_Header
+        $JWT_Token = Invoke-TryCatchLog -InfoLog "Generating the JWT Token" -LogToFile $LogToFile -ScriptBlock {
+            New-Jwt -Cert $Cert -PayloadJson $JWT_Payload -Header $JWT_Header
+        }
 
         $Form = @{
             grant_type              = "client_credentials"
@@ -92,11 +97,15 @@ Function Connect-GraphAPI {
             "Content-Type" = "application/x-www-form-urlencoded;charset=UTF-8"
         }
         
-        $GraphAPIToken = Invoke-RestMethod -Method POST -Uri $OAUTH2Url -Body $Form -Headers $Headers
+        $GraphAPIToken = Invoke-TryCatchLog -InfoLog "Retrieving the Azure Graph API Token" -LogToFile $LogToFile -ScriptBlock {
+            Invoke-RestMethod -Method POST -Uri $OAUTH2Url -Body $Form -Headers $Headers
+        }
         $azureGraphAuthenticationHeader = @{ Authorization = "$($GraphAPIToken.token_type) $($GraphAPIToken.access_token)" }
     }
     else { # Secret
-        $GraphAPIToken = Invoke-RestMethod -Uri "$OAUTH2Url" -Method POST -Body $Body
+        $GraphAPIToken = Invoke-TryCatchLog -InfoLog "Retrieving the Azure Graph API Token" -LogToFile $LogToFile -ScriptBlock {
+            Invoke-RestMethod -Uri "$OAUTH2Url" -Method POST -Body $Body
+        }
         $azureGraphAuthenticationHeader = @{ Authorization = "$($GraphAPIToken.token_type) $($GraphAPIToken.access_token)" }
     }
 
