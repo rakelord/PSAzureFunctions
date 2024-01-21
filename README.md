@@ -6,13 +6,12 @@ At this moment it is mostly used for Synchronization activities to retrieve data
 <br><br>
 If you are looking a function that is missing please send me a message/comment and I will add it to the repository!
 
-# Required modules
-* PSLoggingFunctions (https://github.com/rakelord/PSLoggingFunctions)
-
 # Installation
 ```powershell 
 Install-Module -Name PSAzureFunctions
-``` 
+```
+This will also install Dependency
+* PSLoggingFunctions (https://github.com/rakelord/PSLoggingFunctions)
 # Offline Installation
 Just run the OfflineInstallation.ps1<br>
 PS: You need to download all the files into the same directory and then run the script, they will then be copied to the Users PSModuleDirectory.
