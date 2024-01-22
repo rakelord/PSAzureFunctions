@@ -494,7 +494,7 @@ Function Get-AzureTenantSecurityScore {
         $securityScore = Invoke-TryCatchLog -InfoLog "Retrieving Security Score for Tenant" -LogToFile $LogToFile -ScriptBlock {
             Invoke-RestMethod -Method GET -Uri 'https://graph.microsoft.com/beta/security/secureScores?$top=1' -Headers $azureGraphAuthenticationHeader
         }
-        return @{
+        return [pscustomobject]@{
             TenantSecurityScore = [math]::Round(($securityScore.value.currentScore / $securityScore.value.maxScore) * 100,2)
             ComparableTenantsSecurityScore = ($securityScore.value.averageComparativeScores | Where-Object {$_.basis -eq 'TotalSeats'}).averageScore
         }
