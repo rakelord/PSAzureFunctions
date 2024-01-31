@@ -501,4 +501,37 @@ Function Get-AzureTenantSecurityScore {
     }
 }
 
+Function Get-ServicePrincipals {
+    # Permission: Application.Read.All
+    param(
+        [parameter(mandatory)]
+        [ValidateSet("True","False")]
+        $LogToFile
+    )
+    if (Find-AzureGraphAPIConnection) {
+        $Url = "https://graph.microsoft.com/beta/servicePrincipals?" + '$top=999'
+        $Output = Invoke-TryCatchLog -InfoLog "Retrieve App servicePrincipals" -LogToFile $LogToFile -ScriptBlock {
+            Invoke-RestMethod -Method GET -Uri $Url -Headers $azureGraphAuthenticationHeader
+        }
+        return $Output
+    }
+}
+
+Function Get-ServicePrincipalSignInActivities {
+    # Permission: AuditLog.Read.All
+    param(
+        [parameter(mandatory)]
+        [ValidateSet("True","False")]
+        $LogToFile
+    )
+
+    if (Find-AzureGraphAPIConnection) {
+        $Url = "https://graph.microsoft.com/beta/reports/servicePrincipalSignInActivities?" + '$top=999'
+        $Output = Invoke-TryCatchLog -InfoLog "Retrieve Sign in Activity for App servicePrincipals" -LogToFile $LogToFile -ScriptBlock {
+            Invoke-RestMethod -Method GET -Uri $Url -Headers $azureGraphAuthenticationHeader
+        }
+        return $Output
+    }
+} 
+
 Export-ModuleMember -Function * -Alias *
