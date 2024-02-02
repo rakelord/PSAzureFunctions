@@ -500,8 +500,7 @@ Function Get-AzureTenantSecurityScore {
         }
     }
 }
-
-Function Get-ServicePrincipals {
+Function Get-AzureServicePrincipals {
     # Permission: Application.Read.All
     param(
         [parameter(mandatory)]
@@ -516,8 +515,25 @@ Function Get-ServicePrincipals {
         return $Output
     }
 }
+Function Get-AzureServicePrincipalOwner {
+    # Permission: Application.Read.All
+    param(
+        [parameter(mandatory)]
+        $ServicePrincipalID,
+        [parameter(mandatory)]
+        [ValidateSet("True","False")]
+        $LogToFile
+    )
+    if (Find-AzureGraphAPIConnection) {
+        $Url = "https://graph.microsoft.com/beta/servicePrincipals/$ServicePrincipalID/owners"
+        $Output = Invoke-TryCatchLog -InfoLog "Retrieve App servicePrincipal: $ServicePrincipalID Owner" -LogToFile $LogToFile -ScriptBlock {
+            Invoke-RestMethod -Method GET -Uri $Url -Headers $azureGraphAuthenticationHeader
+        }
+        return $Output
+    }
+}
 
-Function Get-ServicePrincipalSignInActivities {
+Function Get-AzureServicePrincipalSignInActivities {
     # Permission: AuditLog.Read.All
     param(
         [parameter(mandatory)]
@@ -533,5 +549,41 @@ Function Get-ServicePrincipalSignInActivities {
         return $Output
     }
 } 
+
+Function Get-AzureApplications {
+    # Permission: Application.Read.All, Directory.Read.All
+    param(
+        [parameter(mandatory)]
+        [ValidateSet("True","False")]
+        $LogToFile
+    )
+
+    if (Find-AzureGraphAPIConnection) {
+        $Url = "https://graph.microsoft.com/beta/applications"
+        $Output = Invoke-TryCatchLog -InfoLog "Retrieve Azure Applications" -LogToFile $LogToFile -ScriptBlock {
+            Invoke-RestMethod -Method GET -Uri $Url -Headers $azureGraphAuthenticationHeader
+        }
+        return $Output
+    }
+}
+
+Function Get-AzureApplicationOwner {
+    # Permission: Application.ReadWrite.OwnedBy
+    param(
+        [parameter(mandatory)]
+        $AppID,
+        [parameter(mandatory)]
+        [ValidateSet("True","False")]
+        $LogToFile
+    )
+
+    if (Find-AzureGraphAPIConnection) {
+        $Url = "https://graph.microsoft.com/beta/applications(appId='$AppID')/owners"
+        $Output = Invoke-TryCatchLog -InfoLog "Retrieve Azure Application $AppID Owner" -LogToFile $LogToFile -ScriptBlock {
+            Invoke-RestMethod -Method GET -Uri $Url -Headers $azureGraphAuthenticationHeader
+        }
+        return $Output
+    }
+}
 
 Export-ModuleMember -Function * -Alias *
