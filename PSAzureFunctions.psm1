@@ -586,4 +586,38 @@ Function Get-AzureApplicationOwner {
     }
 }
 
-Export-ModuleMember -Function * -Alias *
+function Get-EndpointManagerDevice {
+    param(
+        [parameter(mandatory)]
+        $serialNumber,
+        [parameter(mandatory)]
+        [ValidateSet("True","False")]
+        $LogToFile
+    )
+    if (Find-AzureGraphAPIConnection) {
+        if (IsNotNULL($serialNumber)) {
+            $EndpointDevice = Invoke-TryCatchLog -InfoLog "Retrieving device $DeviceName in EndpointManager" -LogToFile $LogToFile -ScriptBlock {
+                $Uri = "https://graph.microsoft.com/beta/deviceManagement/managedDevices" + '?$filter='+ "serialNumber eq '$DeviceName'"
+                Invoke-RestMethod -Method GET -Uri $Uri -Headers $azureGraphAuthenticationHeader -ContentType "application/json"
+            }
+            return $EndpointDevice.value
+        }
+    }
+}
+
+Function Remove-EndpointManagerDevice {
+    param(
+        [parameter(mandatory)]
+        $serialNumber,
+        [parameter(mandatory)]
+        [ValidateSet("True","False")]
+        $LogToFile
+    )
+    if (Find-AzureGraphAPIConnection) {
+        $EndpointDevice = Get-EndpointManagerDevice -serialNumber $serialNumber -LogToFile $LogToFile
+
+        Invoke-TryCatchLog -InfoLog "Deleting device $DeviceName - $($EndpointDevice.id) in EndpointManager" -LogToFile $LogToFile -LogType DELETE -ScriptBlock {
+            Invoke-RestMethod -Method DELETE -Uri "https://graph.microsoft.com/beta/deviceManagement/managedDevices/$($EndpointDevice.id)" -Headers $azureGraphAuthenticationHeader -ContentType "application/json"
+        }
+    }
+}
